@@ -1,0 +1,59 @@
+server:
+  port: 8080
+
+eureka:
+  client:
+    enabled: true
+    serviceUrl:
+      #注册中心的地址
+      defaultZone: http://localhost:8761/eureka/
+
+spring:
+  application:
+    name: gateway
+    instance:
+      prefer-ip-address: true
+      virtual-host-name: ${spring.application.name}
+  cloud:
+    gateway:
+      routes:
+        - id: demo1
+          uri: lb://demo1
+          predicates:
+            - Path=/demo1/**
+          filters:
+            - StripPrefix=1  #去掉过滤Path路径
+        - id: demo2
+          uri: lb://demo2
+          predicates:
+            - Path=/demo2/**
+          filters:
+            - StripPrefix=1
+      discovery:
+        locator:
+          enabled: true
+#        filters:
+#          - name: RequestRateLimiter
+#            args:
+#              redis-rate-limiter.replenishRate: 1  # 令牌桶的容积
+#              redis-rate-limiter.burstCapacity: 3  # 流速 每秒
+#              key-resolver: "#{@userKeyResolver}" #SPEL表达式去的对应的bean
+#              rate-limiter: "#{@redisRateLimiter}"
+#      - id: xujin_route
+#         uri: http://www.xujin.org:80/
+#        predicates:
+#          - Path=/xujin
+#          - Weight=100
+#          filters:
+#            - name: RequestRateLimiter
+#              args:
+#                redis-rate-limiter.replenishRate: 1  # 令牌桶的容积
+#                redis-rate-limiter.burstCapacity: 3  # 流速 每秒
+#                key-resolver: "#{@userKeyResolver}" #SPEL表达式去的对应的bean
+#                rate-limiter: "#{@redisRateLimiter}"
+##                  key-resolver: "#{@userKeyResolver}"
+#            - StripPrefix=1
+
+feign:
+  hystrix:
+    enabled: true
